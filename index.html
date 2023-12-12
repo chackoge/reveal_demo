@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/serif.css">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css">
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+			  <section>
+			    <h2>Citation Networks from PubMed and Open Citations</h2>
+			    <br><br>
+			  <style>
+			    p {
+				text-align: left;
+			    }
+			  </style>  
+			  <p>George Chacko</p>
+			  </section>
+
+			  <section>
+			    <h2>PubMed Data</h2>
+			    <br><br>
+			    <ul>
+			    <li class="fragment"><a href="https://www.nlm.nih.gov/dataguide/edirect/archive.html">Use EDirect to download PubMed</a></li>
+			    <li class="fragment">Parse PubMed files for fields of interest</li>
+			    <li class="fragment">Cleanup with SQL</li>
+			    </ul>
+			  </section>
+
+  			  <section>
+			    <h2> Essence of parser </h2>
+			    <p> Use xml2 library to parse compressed xml.gz files </p>
+			    <pre><code data-trim data-noescape>
+				my_xml <- xml2::read_xml("file_name")
+				v1= xml_text(xml_find_first(xml_children(my_xml), "./*/PMID"))
+				...					  ...
+				df <- data.frame(v1,v2...v6)
+			    </code></pre>
+			    <p> Export in csv, feather, and parquet formats</p>			
+			  </section>
+
+			  <section>
+			    <h2> SQL Cleanup </h2>
+			      <ul>
+				<li class="fragment">Remove all rows where pmid is null</li>
+				<li class="fragment">Remove all rows where article_id is null or empty</li>
+				<li class="fragment">Set all dois to lower case</li>
+				<li class="fragment">Select latest record for cases of multiple pmids?</li>
+				<li class="fragment">Delete rows where multiple dois point at the same pmid</li>				
+			      </ul>			    
+                          </section>
+
+
+			  <section>
+			    <h2>Resultant Table</h2>
+			    <h4>(showing selected fields)</h4>
+
+			    <table>
+    			      <thead><tr>
+				  <th>pmid</th>
+				  <th>article_id_doi</th>
+				  <th>date_revised</th>
+			      </tr></thead>
+			      <tbody><tr>
+				  <td>37917165</td>
+				  <td>10.1007/s00405-023-08319-9</td>
+				  <td>20231102</td>
+				</tr>
+				<tr>
+				  <td>37917163</td>
+				  <td>10.1007/s00405-023-08301-5</td>
+				  <td>20231102</td>
+			      </tr></tbody>
+			    </table>
+			  </section>  
+			  
+			  <section>
+			  <h2>Seed Set Expansion </h2>  
+			      <ul>
+				<li class="fragment">Collect seed set representing essential articles in theme, e.g., lexical search for "exosome" in some period of time.</li>
+				<li class="fragment">Use dois to collect multiple rounds of citinga and cited from Open Citations</li>
+				<li class="fragment">Optional: Restrict to dois with pmids if node metadata is important</li>				
+				<li class="fragment">Generate node and edge lists (with duplicates suppressed)</li>
+			      </ul>
+			  </section>
+			  
+			  <section>
+			    <h2> Example: PI-3K Networks </h2>
+			      <ul>
+				<li class="fragment">11,501,774 nodes </li>
+				<li class="fragment">321,135,732 edges </li>
+				<li class="fragment">Is incomplete but reproducible and transparent!</li>
+			      </ul>
+			  </section>
+			  <section>
+			    <h1> The End </h1>
+			    <br><br><br>
+			    <h3> Thank You </h3>
+			    <h4> Dec 12, 2023 version </h4>
+			  </section>
+ 		</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+			});
+		</script>
+	</body>
+</html>
